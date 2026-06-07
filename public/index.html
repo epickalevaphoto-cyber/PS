@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>PoetryShazam — Where Words Bleed & Artists Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #12121a 100%);
+            color: #f4efe9;
+            min-height: 100vh;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #fff 20%, #d4af37 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: #8b796d;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        /* Grid Layout */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 16px;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(18, 18, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+
+        /* Battle List */
+        .battle-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .battle-item:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .battle-item.active {
+            border-color: #d4af37;
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .battle-item.completed {
+            opacity: 0.6;
+            border-color: rgba(46, 204, 113, 0.5);
+        }
+
+        .battle-poets {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .poet-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .vs {
+            color: #d4af37;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .battle-status {
+            font-size: 11px;
+            color: #8b796d;
+        }
+
+        .status-badge {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: #d4af37;
+        }
+
+        .status-badge.completed {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+        }
+
+        /* Arena */
+        .arena {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .poet-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .poet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .poet-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .mic-btn {
+            background: rgba(212, 175, 55, 0.15);
+            border: 2px solid #d4af37;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mic-btn:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: scale(1.05);
+        }
+
+        .mic-btn.recording {
+            border-color: #ff4a4a;
+            background: rgba(255, 74, 74, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 74, 74, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 74, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 74, 74, 0); }
+        }
+
+        .poem-textarea {
+            width: 100%;
+            min-height: 150px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'Inter', monospace;
+        }
+
+        .poem-textarea:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .timer {
+            font-size: 12px;
+            color: #8b796d;
+            margin-top: 8px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #d4af37, #b8941e);
+            border: none;
+            border-radius: 40px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #12121a;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Add Battle Form */
+        .add-battle-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .add-battle-form input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #fff;
+        }
+
+        .add-battle-form input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .add-btn {
+            background: #d4af37;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: #12121a;
+            cursor: pointer;
+        }
+
+        .start-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #ff4a4a, #cc0000);
+            border: none;
+            border-radius: 40px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .remaining {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #8b796d;
+        }
+
+        .results-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 15, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 24px;
+            display: none;
+        }
+
+        .results-screen.active {
+            display: block;
+        }
+
+        .close-results {
+            background: none;
+            border: none;
+            color: #d4af37;
+            font-size: 24px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #d4af37;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">POETRYSHAZAM</div>
+            <div class="tagline">WHERE WORDS BLEED & ARTISTS BATTLE</div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard">
+            <!-- Left Panel: Tournament Setup -->
+            <div>
+                <div class="card">
+                    <div class="card-title">CONFIGURE TOURNAMENT</div>
+                    
+                    <div id="battles-list">
+                        <!-- Батлы будут добавляться сюда -->
+                    </div>
+
+                    <div class="add-battle-form">
+                        <input type="text" id="poet1-name-input" placeholder="Poet 1 Name">
+                        <input type="text" id="poet2-name-input" placeholder="Poet 2 Name">
+                        <button class="add-btn" onclick="addBattle()">+ ADD BATTLE</button>
+                    </div>
+
+                    <button class="start-btn" id="start-tournament-btn" onclick="startTournament()">START TOURNAMENT</button>
+                    <div class="remaining" id="remaining-battles">0 battles configured</div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Live Arena -->
+            <div>
+                <div class="card">
+                    <div class="card-title">LIVE ARENA</div>
+                    <div id="arena-content">
+                        <div style="text-align: center; color: #8b796d; padding: 40px;">
+                            Configure battles to start
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="results-screen" class="results-screen">
+        <button class="close-results" onclick="closeResults()">✕</button>
+        <div style="max-width: 600px; margin: 0 auto;">
+            <h2 id="results-title" style="font-size: 28px; margin-bottom: 20px;">Battle Analysis</h2>
+            <div id="results-content"></div>
+            <button class="submit-btn" onclick="closeResults()" style="margin-top: 30px;">Back to Arena</button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div style="margin-top: 20px; color: #d4af37;">🤖 YandexGPT analyzing...</div>
+    </div>
+
+    <script>
+        // API endpoint
+        const SHEETY_API_URL = "/api/battle";
+
+        // State
+        let battles = [];
+        let currentBattleIndex = 0;
+        let tournamentStarted = false;
+        let currentPoetRecording = 1; // 1 or 2
+        let recordingActive = false;
+        let recognition = null;
+        let recordingTimer = null;
+        let recordingSeconds = 0;
+
+        // Load from localStorage
+        function loadBattles() {
+            const saved = localStorage.getItem('poetryShazamBattles');
+            if (saved) {
+                battles = JSON.parse(saved);
+            }
+            if (battles.length === 0) {
+                // Default demo battles
+                battles = [
+                    { id: 1, poet1: "ВАСИЛЬ", poet2: "ТОВЧЕННИКОВ", poem1: "", poem2: "", time1: "", time2: "", completed: false, topic: "", result: null },
+                    { id: 2, poet1: "АННА", poet2: "МИХАИЛ", poem1: "", poem2: "", time1: "", time2: "", completed: false, topic: "", result: null }
+                ];
+            }
+            renderBattlesList();
+            updateRemaining();
+        }
+
+        function saveBattles() {
+            localStorage.setItem('poetryShazamBattles', JSON.stringify(battles));
+            renderBattlesList();
+            updateRemaining();
+        }
+
+        function addBattle() {
+            const poet1 = document.getElementById('poet1-name-input').value.trim();
+            const poet2 = document.getElementById('poet2-name-input').value.trim();
+            if (!poet1 || !poet2) {
+                alert("Please enter both poet names");
+                return;
+            }
+            battles.push({
+                id: battles.length + 1,
+                poet1: poet1,
+                poet2: poet2,
+                poem1: "",
+                poem2: "",
+                time1: "",
+                time2: "",
+                completed: false,
+                topic: "",
+                result: null
+            });
+            document.getElementById('poet1-name-input').value = "";
+            document.getElementById('poet2-name-input').value = "";
+            saveBattles();
+        }
+
+        function removeBattle(id) {
+            battles = battles.filter(b => b.id !== id);
+            saveBattles();
+            if (tournamentStarted && currentBattleIndex >= battles.length) {
+                tournamentStarted = false;
+                document.getElementById('start-tournament-btn').disabled = false;
+                document.getElementById('start-tournament-btn').textContent = "START TOURNAMENT";
+            }
+            if (tournamentStarted && battles[currentBattleIndex]) {
+                renderArena(battles[currentBattleIndex]);
+            } else if (!tournamentStarted) {
+                document.getElementById('arena-content').innerHTML = '<div style="text-align: center; color: #8b796d; padding: 40px;">Configure battles to start</div>';
+            }
+        }
+
+        function renderBattlesList() {
+            const container = document.getElementById('battles-list');
+            if (!container) return;
+            
+            if (battles.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #8b796d; padding: 20px;">No battles yet. Add your first battle!</div>';
+                return;
+            }
+
+            container.innerHTML = battles.map(battle => `
+                <div class="battle-item ${tournamentStarted && currentBattleIndex === battle.id - 1 ? 'active' : ''} ${battle.completed ? 'completed' : ''}" onclick="selectBattle(${battle.id})">
+                    <div class="battle-poets">
+                        <span class="poet-name">${escapeHtml(battle.poet1)}</span>
+                        <span class="vs">VS</span>
+                        <span class="poet-name">${escapeHtml(battle.poet2)}</span>
+                    </div>
+                    <div class="battle-status">
+                        ${battle.completed ? 
+                            '<span class="status-badge completed">✅ Completed</span>' : 
+                            '<span class="status-badge">⏳ Pending</span>'
+                        }
+                        ${!tournamentStarted && !battle.completed ? 
+                            `<button class="remove-battle" onclick="event.stopPropagation(); removeBattle(${battle.id})" style="background:none; border:none; color:#ff4a4a; cursor:pointer; float:right; font-size:12px;">✕</button>` : 
+                            ''
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectBattle(id) {
+            if (!tournamentStarted) return;
+            currentBattleIndex = id - 1;
+            renderBattlesList();
+            renderArena(battles[currentBattleIndex]);
+        }
+
+        function startTournament() {
+            if (battles.length === 0) {
+                alert("Please add at least one battle first");
+                return;
+            }
+            tournamentStarted = true;
+            currentBattleIndex = 0;
+            document.getElementById('start-tournament-btn').disabled = true;
+            document.getElementById('start-tournament-btn').textContent = "TOURNAMENT IN PROGRESS";
+            renderBattlesList();
+            renderArena(battles[0]);
+        }
+
+        function updateRemaining() {
+            const remaining = battles.filter(b => !b.completed).length;
+            document.getElementById('remaining-battles').innerHTML = `${remaining} battles remaining`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return str;
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Web Speech API
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("❌ Your browser doesn't support speech recognition. Please use Chrome.");
+                return false;
+            }
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'ru-RU';
+            return true;
+        }
+
+        function startRecordingForPoet(poetNum) {
+            if (!recognition && !initSpeechRecognition()) return;
+            
+            currentPoetRecording = poetNum;
+            recordingActive = true;
+            
+            const battle = battles[currentBattleIndex];
+            const textarea = document.getElementById(`poem-${poetNum}`);
+            if (textarea) {
+                textarea.value = "";
+            }
+            
+            let interimText = "";
+            let finalText = "";
+            
+            recognition.onresult = (event) => {
+                let interim = "";
+                let final = "";
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        final += event.results[i][0].transcript + " ";
+                    } else {
+                        interim += event.results[i][0].transcript;
+                    }
+                }
+                finalText += final;
+                interimText = interim;
+                if (textarea) {
+                    textarea.value = (finalText + interimText).trim();
+                    textarea.scrollTop = textarea.scrollHeight;
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                if (event.error === 'no-speech') return;
+                console.error("Recognition error:", event.error);
+            };
+            
+            recognition.onend = () => {
+                if (recordingActive && textarea) {
+                    textarea.value = finalText.trim();
+                    if (poetNum === 1) {
+                        battle.poem1 = finalText.trim();
+                        battle.time1 = formatTime(recordingSeconds);
+                    } else {
+                        battle.poem2 = finalText.trim();
+                        battle.time2 = formatTime(recordingSeconds);
+                    }
+                    saveBattles();
+                    
+                    const micBtn = document.getElementById(`mic-${poetNum}`);
+                    if (micBtn) micBtn.classList.remove('recording');
+                    const timerDisplay = document.getElementById(`timer-${poetNum}`);
+                    if (timerDisplay) timerDisplay.innerHTML = "";
+                    recordingActive = false;
+                    stopTimer();
+                }
+            };
+            
+            recognition.start();
+            startTimerForPoet(poetNum);
+            
+            const micBtn = document.getElementById(`mic-${poetNum}`);
+            if (micBtn) micBtn.classList.add('recording');
+        }
+
+        function stopRecording() {
+            if (recognition && recordingActive) {
+                recognition.stop();
+            }
+        }
+
+        let currentTimerInterval = null;
+        
+        function startTimerForPoet(poetNum) {
+            recordingSeconds = 0;
+            const timerDisplay = document.getElementById(`timer-${poetNum}`);
+            if (timerDisplay) timerDisplay.innerHTML = "00:00";
+            if (currentTimerInterval) clearInterval(currentTimerInterval);
+            currentTimerInterval = setInterval(() => {
+                recordingSeconds++;
+                if (timerDisplay) timerDisplay.innerHTML = formatTime(recordingSeconds);
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (currentTimerInterval) {
+                clearInterval(currentTimerInterval);
+                currentTimerInterval = null;
+            }
+            return recordingSeconds;
+        }
+        
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60);
+            let s = sec % 60;
+            return `${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+        }
+
+        function updatePoemText(poetNum, value) {
+            const battle = battles[currentBattleIndex];
+            if (poetNum === 1) {
+                battle.poem1 = value;
+            } else {
+                battle.poem2 = value;
+            }
+            saveBattles();
+        }
+
+        async function submitBattle() {
+            const battle = battles[currentBattleIndex];
+            
+            if (!battle.poem1 || battle.poem1.length < 20) {
+                alert(`⚠️ ${battle.poet1}'s poem is too short (minimum 20 characters). Please record or type more.`);
+                return;
+            }
+            if (!battle.poem2 || battle.poem2.length < 20) {
+                alert(`⚠️ ${battle.poet2}'s poem is too short (minimum 20 characters). Please record or type more.`);
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                const response = await fetch(SHEETY_API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: battle.id,
+                        p1Name: battle.poet1,
+                        p1Text: battle.poem1,
+                        p1Time: battle.time1 || "00:30",
+                        p2Name: battle.poet2,
+                        p2Text: battle.poem2,
+                        p2Time: battle.time2 || "00:30"
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === "success") {
+                    battle.completed = true;
+                    battle.result = result;
+                    saveBattles();
+                    
+                    showResults(battle, result);
+                    
+                    // Move to next battle
+                    if (currentBattleIndex + 1 < battles.length) {
+                        currentBattleIndex++;
+                        renderArena(battles[currentBattleIndex]);
+                        renderBattlesList();
+                    } else {
+                        tournamentStarted = false;
+                        document.getElementById('start-tournament-btn').disabled = false;
+                        document.getElementById('start-tournament-btn').textContent = "START TOURNAMENT";
+                        document.getElementById('arena-content').innerHTML = '<div style="text-align: center; color: #2ecc71; padding: 40px;">🏆 TOURNAMENT COMPLETED! 🏆</div>';
+                        renderBattlesList();
+                    }
+                    updateRemaining();
+                } else {
+                    throw new Error(result.message);
+                }
+            } catch(err) {
+                alert("❌ Error: " + err.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function showResults(battle, result) {
+            const avg1 = ((parseFloat(result.p1Content) + parseFloat(result.p1Delivery)) / 2).toFixed(1);
+            const avg2 = ((parseFloat(result.p2Content) + parseFloat(result.p2Delivery)) / 2).toFixed(1);
+            
+            document.getElementById('results-title').innerHTML = `BATTLE ${battle.id} ANALYSIS`;
+            document.getElementById('results-content').innerHTML = `
+                <div style="background: rgba(0,0,0,0.4); border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                        <div style="text-align: center; flex: 1;">
+                            <h3 style="color: #d4af37;">${escapeHtml(battle.poet1)}</h3>
+                            <div style="font-size: 36px; font-weight: 800;">${avg1}</div>
+                            <div style="font-size: 12px; color: #8b796d;">Score</div>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <h3 style="color: #d4af37;">VS</h3>
+                        </div>
+                        <div style="text-align: center; flex: 1;">
+                            <h3 style="color: #d4af37;">${escapeHtml(battle.poet2)}</h3>
+                            <div style="font-size: 36px; font-weight: 800;">${avg2}</div>
+                            <div style="font-size: 12px; color: #8b796d;">Score</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(212,175,55,0.1); border-radius: 12px;">
+                        <div style="color: #d4af37; font-weight: bold;">🏆 VERDICT</div>
+                        <p>${escapeHtml(result.totalVerdict)}</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="color: #d4af37; font-weight: bold;">📖 ${escapeHtml(battle.poet1)} - CRITIQUE</div>
+                        <p>${escapeHtml(result.p1Critique)}</p>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="color: #d4af37; font-weight: bold;">📖 ${escapeHtml(battle.poet2)} - CRITIQUE</div>
+                        <p>${escapeHtml(result.p2Critique)}</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results-screen').classList.add('active');
+        }
+
+        function closeResults() {
+            document.getElementById('results-screen').classList.remove('active');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function renderArena(battle) {
+            if (!battle) return;
+            
+            const container = document.getElementById('arena-content');
+            container.innerHTML = `
+                <div class="arena">
+                    <div class="poet-card">
+                        <div class="poet-header">
+                            <h3>${escapeHtml(battle.poet1)}</h3>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div id="timer-1" class="timer"></div>
+                                <button class="mic-btn" id="mic-1" onclick="startRecordingForPoet(1)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="poem-textarea" id="poem-1" placeholder="Poem text appears here... or type manually" oninput="updatePoemText(1, this.value)">${escapeHtml(battle.poem1)}</textarea>
+                        <div class="timer">Time: ${battle.time1 || '00:00'}</div>
+                    </div>
+                    
+                    <div style="text-align: center; font-size: 24px; font-weight: 800; color: #d4af37;">VS</div>
+                    
+                    <div class="poet-card">
+                        <div class="poet-header">
+                            <h3>${escapeHtml(battle.poet2)}</h3>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                <div id="timer-2" class="timer"></div>
+                                <button class="mic-btn" id="mic-2" onclick="startRecordingForPoet(2)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <textarea class="poem-textarea" id="poem-2" placeholder="Poem text appears here... or type manually" oninput="updatePoemText(2, this.value)">${escapeHtml(battle.poem2)}</textarea>
+                        <div class="timer">Time: ${battle.time2 || '00:00'}</div>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="submitBattle()">SUBMIT BATTLE TO JUDGES</button>
+                </div>
+            `;
+        }
+
+        // Initialize
+        loadBattles();
+    </script>
+</body>
+</html>
